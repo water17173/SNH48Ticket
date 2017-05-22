@@ -23,13 +23,13 @@ postData = {'id':'×','num':'1','seattype':'2','brand_id':'3','r':'0.37311310063
 #id:门票编号，num:门票数量，seattype:门票类型,2为VIP，3为普座，4为站票，brand_id：团体编号(gnz48为3)，’r‘:随机数
 if __name__ == '__main__':
     r = requests.session()
-    res = r.get('https://shop.48.cn/tickets/item/994',headers = {'Cookie':cookies})
+    res = r.get('https://shop.48.cn/tickets/item/*',headers = {'Cookie':cookies})#*为门票编号
     while 1:
-        content = r.get('https://shop.48.cn/tickets/saleList?id=*&brand_id=*')#查询库存，*为门票编号和库存
-        if eval(content.text.replace('true','""'))[*]['amount'] == 1:#*为票种，1为VIP，2为普座，3为站票
+        req = r.get('https://shop.48.cn/tickets/saleList?id=*&brand_id=*')#查询库存，*为门票编号和团体编号
+        req = eval(req.content.replace('false','0').replace('true','1'))
+        if req[1]["tickets_sale_is_on_sale"] ==  1 and req[1]['amount'] == 1:#*为票种，1为VIP，2为普座，3为站票
             content = r.post('https://shop.48.cn/TOrder/add',headers = postheader,data = postData)
             if content.status_code == 200:
-                print '下单成功，请前往shop.snh48.com付款。'
-                break
+                print '下单成功，请前往shop.snh48.com付款。
         else:continue
 
