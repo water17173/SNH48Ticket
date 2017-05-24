@@ -25,9 +25,13 @@ if __name__ == '__main__':
     r = requests.session()
     res = r.get('https://shop.48.cn/tickets/item/*',headers = {'Cookie':cookies})#*为门票编号
     while 1:
-        req = r.get('https://shop.48.cn/tickets/saleList?id=*&brand_id=*')#查询库存，*为门票编号和团体编号
-        req = eval(req.content.replace('false','0').replace('true','1'))
-        if req[1]["tickets_sale_is_on_sale"] ==  1 and req[1]['amount'] == 1:#*为票种，1为VIP，2为普座，3为站票
+        try:
+            req = r.get('https://shop.48.cn/tickets/saleList?id=1022&brand_id=3')#查询库存，*为门票编号和团体编号
+            req = eval(req.content.replace('true','1').replace('false','0'))
+        except:
+            traceback.print_exc()
+            continue
+        if req[1]['amount']:#*为票种，1为VIP，2为普座，3为站票
             content = r.post('https://shop.48.cn/TOrder/add',headers = postheader,data = postData)
             if content.status_code == 200:
                 print '下单成功，请前往shop.snh48.com付款。
