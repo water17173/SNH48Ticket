@@ -53,7 +53,7 @@ if __name__ == '__main__':
                 headers={'Cookie': cookies})  # *为门票编号
     url = 'https://shop.48.cn/tickets/saleList?id=1022&brand_id=3'
     # ts = []
-    start = time.clock()
+    # start = time.clock()
     for i in range(15):
         th = threading.Thread(target=tickets,args = [url,r])
         th.start()
