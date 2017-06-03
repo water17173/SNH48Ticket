@@ -40,7 +40,7 @@ def tickets(url,r):
             continue
         if json.loads(req.content)[1]['amount']:  # *为票种，1为VIP，2为普座，3为站票
             content = r.post('https://shop.48.cn/TOrder/add',
-                           headers=postheader, data=postData)
+                           headers={'Cookie': cookies}, data=postData)
           if content.status_code == 200:
               print '下单成功，请前往shop.snh48.com付款。'
         else:
