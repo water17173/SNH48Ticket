@@ -34,12 +34,10 @@ def tickets(url,r):
     while 1:
         try:
             req = r.get(url)
-            req = eval(req.content.replace('true', '1').replace('false', '0'))
         except:
             traceback.print_exc()
             continue
-        # print req[1]['amount']
-        if req[1]['amount']:  # *为票种，1为VIP，2为普座，3为站票
+        if json.loads(req.content)[1]['amount']:  # *为票种，1为VIP，2为普座，3为站票
             content = r.post('https://shop.48.cn/TOrder/add',
                            headers=postheader, data=postData)
           if content.status_code == 200:
