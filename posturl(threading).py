@@ -1,72 +1,67 @@
 # -*- coding: utf-8 -*-
+
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from tkinter import *
+import time
 import requests
 import urllib
 import traceback
 import threading
-import time
 import json
 
-urllib.getproxies_registry = lambda: {}
-cookies = 'your cookie'
-# https://shop.48.cn/tickets/item/* 的cookie，×为门票编号
 
-postheader = {'Accept': 'application/json, text/javascript, */*; q=0.01',
-              'Accept-Encoding': 'gzip, deflate, sdch, br',
-              'Accept-Language': 'zh-CN,zh;q=0.8',
-              'Connection': 'keep-alive',
-              'Content-Length': '56',
-              'Content-Type': 'application/x-www-form-urlencoded; \
-               charset=UTF-8',
-              'Cookie': cookies,
-              'Host': 'shop.48.cn',
-              'Origin': 'https://shop.48.cn',
-              'Referer': 'https://shop.48.cn/tickets/item/1022',  # *为门票编号
-              'Referer': 'https://shop.48.cn/tickets',
-              'Upgrade-Insecure-Requests': '1',
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
-              AppleWebKit/537.36 (KHTML, like Gecko) \
-              Chrome/58.0.3029.110 Safari/537.36',
-              'X-Requested-With': 'XMLHttpRequest'}
+class order(object):
+    def __init__(self,user,password,ticketcode,seattype):
+        self.user = user
+        self.password = password
+        self.ticketcode = ticketcode
+        self.seattype = seattype
+        self.cookies = ''
+        self.req = requests.session()
+        root = Tk()
+        self.login()
 
-postData = {'id': '1022', 'num': '1', 'seattype': '2',
-            'brand_id': '3', 'r': '0.3731131006391708'}
-# id:门票编号，num:门票数量，seattype:门票类型,2为VIP，3为普座，4为站票，brand_id：团体编号(gnz48为3)，’r‘:随机数
-def tickets(url,r):
-    while 1:
-        try:
-            req = r.get(url)
-        except:
-            traceback.print_exc()
-            continue
-        if json.loads(req.content)[1]['amount']:  # *为票种，1为VIP，2为普座，3为站票
-            content = r.post('https://shop.48.cn/TOrder/add',
-                           headers={'Cookie': cookies}, data=postData)
-            if content.status_code == 200:
-                print '下单成功，请前往shop.snh48.com付款。'
-        else:
-            continue
+    def login(self):
+        browser = webdriver.Chrome()
+        browser.maximize_window()
+        browser.implicitly_wait(10)
+        browser.set_page_load_timeout(30)
+        browser.get('http://vip.48.cn/Home/Login/index.html')
+        browser.find_element_by_id('login').click()
+        browser.find_element_by_id('username').send_keys(self.user)
+        browser.find_element_by_id('password').send_keys(self.password)
+        browser.find_element_by_id('submit').click()
+        browser.find_element_by_link_text('SNH48 GROUP官方商城').click()
+        browser.switch_to_window(browser.window_handles[-1])
+        for i in browser.get_cookies():
+            self.cookies += i['name']
+            self.cookies += '='
+            self.cookies += i['value']
+            self.cookies += '; '
+        self.cookies.strip(';')
+        print self.cookies
+        browser.quit()
+
+    def ticket(self):
+    	url = 'http://shop.48.cn'
+    	res = self.req.get(url,headers = {'Cookie':self.cookies})
+        postData = {'id': self.ticketcode, 'num': '1', 'seattype': self.seattype,'brand_id': '3', 'r': '0.3731131006391708'}  # id:门票编号，num:门票数量，seattype:门票类型,2为VIP，3为普座，4为站票，brand_id：团体编号(gnz48为3)，’r‘:随机数
+        while 1:
+	        try:
+	            res = self.req.get(url)
+	        except:
+	            traceback.print_exc()
+	            continue
+	        if json.loads(res.content)[1]['amount']:  # *为票种，1为VIP，2为普座，3为站票
+	            resp = self.req.post('https://shop.48.cn/TOrder/add',headers={'Cookie': self.cookies}, data=postData)
+	            if resp.status_code == 200:
+	                print '下单成功，请前往shop.snh48.com付款。'
+	        else:
+	            continue
 
 if __name__ == '__main__':
-    r = requests.session()
-    res = r.get('https://shop.48.cn/tickets/item/1022',
-                headers={'Cookie': cookies})  # *为门票编号
-    url = 'https://shop.48.cn/tickets/saleList?id=1022&brand_id=3'
-    # ts = []
-    # start = time.clock()
-    for i in range(15):
-        th = threading.Thread(target=tickets,args = [url,r])
+	se = order('snh48042191478','yinheng1993','1426','2')  # id:门票编号，seattype:门票类型,2为VIP，3为普座，4为站票
+	for i in range(30):
+        th = threading.Thread(target=se.ticket)
         th.start()
-    #     ts.append(th)
-    
-    # for i in ts:
-    #     i.join()
-
-    
-    # end = time.clock()
-    # print end-start
-    # start = time.clock()
-    # for i in range(50):
-    #     tickets(url,r)
-    # end = time.clock()
-    # print end-start
-    # 
