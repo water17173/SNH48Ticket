@@ -117,9 +117,8 @@ class order(object):
             except:
                 traceback.print_exc()
                 continue
-            if json.loads(res.content)[types]['amount']:  # *为票种，1为VIP，2为普座，3为站票
-                pass
-                # resp = self.req.post('https://shop.48.cn/TOrder/add',headers={'Cookie': self.cookies}, data=postData)     
+            if json.loads(res.content)[types]['amount']:
+                resp = self.req.post('https://shop.48.cn/TOrder/add',headers={'Cookie': self.cookies}, data=postData)     
             else:
                 if times%1000 == 0:
                     soup = BeautifulSoup(requests.get('https://shop.48.cn/TOrder',headers={'Cookie':self.cookies}).content,'html.parser')
@@ -129,4 +128,4 @@ class order(object):
                 continue
 
 if __name__ == '__main__':
-	se = order()  # id:门票编号，seattype:门票类型,2为VIP，3为普座，4为站票
+	se = order()
