@@ -13,7 +13,7 @@ import json
 
 
 
-class order(object):
+class ORDER(object):
     def __init__(self):
         self.cookies = ''
         self.req = requests.session()
@@ -128,4 +128,4 @@ class order(object):
                 continue
 
 if __name__ == '__main__':
-	se = order()
+	se = ORDER()
