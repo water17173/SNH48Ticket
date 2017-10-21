@@ -65,7 +65,7 @@ class ORDER(object):
         self.seattype = self.lb.get(self.lb.curselection())
 
     def login(self):
-        # try:
+        try:
             self.loginstr('登录中...')
             self.user = self.var1.get()
             self.password = self.var2.get()
@@ -89,7 +89,7 @@ class ORDER(object):
             browser.quit()
             self.loginstr('登录成功...')
             self.thread()
-        # except:
+        except:
             self.loginstr('登录失败,请检查账号密码和网络环境...')
 
     def thread(self):
